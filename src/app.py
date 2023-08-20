@@ -1,5 +1,6 @@
 import gradio as gr
 import pandas as pd
+import numpy as np
 import pickle
 import os
 
@@ -48,12 +49,13 @@ model = load_pickle('rf.pkl')
 # function to make predictions
 def predict_churn(gender, SeniorCitizen, Partner, Dependents, Tenure, PhoneService, MultipleLines, InternetService, 
                   OnlineSecurity, OnlineBackup, DeviceProtection,TechSupport,StreamingTV, StreamingMovies, 
-                  Contract, PaperlessBilling, PaymentMethod, MonthlyCharges, TotalCharges):
+                  Contract, PaperlessBilling, PaymentMethod, MonthlyCharges, TotalCharges)
     
     # collects data into a list
     data = [gender, SeniorCitizen, Partner, Dependents, Tenure, PhoneService, MultipleLines, InternetService, 
                    OnlineSecurity, OnlineBackup, DeviceProtection,TechSupport,StreamingTV, StreamingMovies, 
                    Contract, PaperlessBilling, PaymentMethod, MonthlyCharges, TotalCharges]
+    
     # convert data into a numpy array
     x = np.array([data])
     # creates a dataframe 
@@ -61,9 +63,11 @@ def predict_churn(gender, SeniorCitizen, Partner, Dependents, Tenure, PhoneServi
     dataframe = dataframe.astype({'MonthlyCharges': 'float', 'TotalCharges': 'float', 'tenure': 'float'})
     # creates the new features 
     create_new_columns(dataframe)
+    
     # preprocess the data using pipeline
     processed_data = pipeline.transform(dataframe)
     processed_dataframe = create_processed_dataframe(processed_data, dataframe)
+    
     # the model make predictions
     predictions = model.predict_proba(processed_dataframe)
     return round(predictions[0][0], 3), round(predictions[0][1], 3)
